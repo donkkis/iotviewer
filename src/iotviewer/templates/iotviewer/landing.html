@@ -1,0 +1,70 @@
+{% extends "iotviewer/base.html" %}
+{% load static %}
+
+{% block content %}
+<!-- daterangepicker -->
+<script type="text/javascript" src="https://cdn.jsdelivr.net/jquery/latest/jquery.min.js"></script>
+<script type="text/javascript" src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
+<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
+<!-- daterangepicker -->
+
+<div class="container">
+
+    <form action="/display/" method="POST">
+    {% csrf_token %}
+    <div class="row">
+        <div class="col">
+            <label for="datanodeSelect">Datanodes</label>
+            <select multiple class="form-control" name="datanodeSelect">
+              {% for dnode in available_datanodes %}
+              <option>{{dnode}}</option>
+              {% endfor %}
+            </select>
+        </div>
+        <div class="col">
+            <label for="vehicleSelect">Vehicles</label>
+            <select multiple class="form-control" name="vehicleSelect">
+              {% for vehicle in available_vehicles %}
+              <option>{{vehicle}}</option>
+              {% endfor %}
+            </select>
+        </div>
+    </div>
+      
+      <div class="row">
+              <div class="col">
+                <input type="text" name="datefilter" value="" />
+
+                <script type="text/javascript">
+                $(function() {
+                
+                  $('input[name="datefilter"]').daterangepicker({
+                      autoUpdateInput: false,
+                      timePicker: true,
+                      locale: {
+                          format: 'DD.MM.YYYY hh:mm:ss.SSSSSS',
+                          cancelLabel: 'Clear'
+                      }
+                  });
+                
+                  $('input[name="datefilter"]').on('apply.daterangepicker', function(ev, picker) {
+                      $(this).val(picker.startDate.format('DD.MM.YYYY hh:mm:ss.SSSSSS') + ' - ' + picker.endDate.format('DD.MM.YYYY hh:mm:ss.SSSSSS'));
+                  });
+                
+                  $('input[name="datefilter"]').on('cancel.daterangepicker', function(ev, picker) {
+                      $(this).val('');
+                  });
+                
+                });
+                </script>           
+
+            </div>
+        </div>      
+          <div class="form-group">
+            <input type="submit" value="GO">
+          </div>
+    </form>     
+</div>
+
+{% endblock %}

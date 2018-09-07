@@ -1,0 +1,27 @@
+{% extends "iotviewer/base.html" %}
+{% load static %}
+
+{% block content %}
+
+    <h1><center>Hello, world!</center></h1>
+    
+    <center>    
+        <table border=1>
+        <tr>
+            <td></td>
+            {% for dnode in res_list.133353  %}
+            <td>{{ dnode }}</td>
+            {% endfor %}
+        </tr>
+        {% for veh, dnodes in res_list.items %}
+        <tr>
+            <td>{{ veh }}</td>
+            {% for dnode_value in dnodes.values %}
+                <td>{{ dnode_value }}</td>
+            {% endfor %}
+        </tr>
+        {% endfor %}
+        </table>
+    </center>
+    
+{% endblock %}
