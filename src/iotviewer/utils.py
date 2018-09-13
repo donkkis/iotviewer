@@ -22,7 +22,7 @@ def get_data_from_selected(vehicles, dnodes, start=None, stop=None):
             res_list[vehicle] = {}
             for dnode in dnodes:
                 res = cl.request_data(vehicle, dnode, start, stop)
-                print(res)
+                #print(res)
                 if not start and stop:
                     #single value
                     res_list[vehicle][dnode] = res[2][0]['v']
@@ -78,3 +78,19 @@ def get_available_datanodes():
     dnodes = data['Name'].unique()
     #hack for quick test
     return list(dnodes)
+
+def construct_dataset(res_list):
+    """
+    Build a dataset instance to be passed to displayseries.html
+
+    Args:
+        res_list (dict) : a dict passed from view function containing the raw
+        query data
+    
+    Returns:
+        dataset (object) : a dataset instance
+        
+    """
+    pass
+    
+    

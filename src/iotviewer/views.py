@@ -8,6 +8,10 @@ from .models import MultiSeriesResponse
 from .models import VehicleResponse
 from .models import DatanodeSeries
 from .models import DatanodeResponse
+import pandas as pd
+from .models import Dataset
+from .models import DataPoint
+from .models import DatasetArray
 
 def home(request):
     """
@@ -29,8 +33,8 @@ def display(request):
     POST request should include these variables
     
     TODO:
-        refactor to use request variables and not static methods
-    
+        dataset_arr.datasets = [] should not be needed! For some reason datasets
+        are persisted between consecutive calls
     """
     if request.method == 'POST':
         
@@ -41,10 +45,11 @@ def display(request):
         dnodes = request.POST.getlist('datanodeSelect')
         
         print(interval)
+        print(vehicles)
+        print(dnodes)
         
         if len(vehicles) == 0 or len(dnodes) == 0:
-            #empty request should not be allowed but this acts as a double 
-            #check
+            #empty request should not be allowed but we double check here
             raise Exception("No arguments given")
         
         elif interval[0] and interval[1]:
@@ -53,10 +58,28 @@ def display(request):
             start = interval[0]
             stop = interval[1]
             res_list = get_data_from_selected(vehicles, dnodes, start, stop)
+            
+            #implement data unpacking
+            #need separate models.Dataset instance for each (veh_id, dnode_id)
+            dataset_arr = DatasetArray()
+            dataset_arr.datasets = []
+            
+            for veh_id, veh_response in res_list.items():
+                for dnode_id, dnode_series in veh_response.items():
+                    dataset = Dataset(label=f"{veh_id}_{dnode_id}")                    
+                    for dnode_response in dnode_series:
+                        x = dnode_response['ts']
+                        y = dnode_response['v']
+                        #print(veh_id, dnode_id, dnode_response['ts'], dnode_response['v'])
+                        dataset.data.append(DataPoint(x, y))
+                    #print(dataset)
+                    dataset_arr.datasets.append(dataset)
                 
             context = {
+                    'datasets' : dataset_arr.serialize(),
                     'res_list' : res_list
                     }
+            
             return render(request, 'iotviewer/displayseries.html', context)
             
         else:

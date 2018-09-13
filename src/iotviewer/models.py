@@ -32,3 +32,59 @@ class DatanodeResponse(object):
         self.dtype = dtype
         self.timestamp = timestamp
         self.value = value
+        
+class DatasetArray(object):
+    """
+    A collection of datasets that we will pass to displayseries.html as 
+    JSONified string
+    """
+    
+    def __init__(self, datasets=[]):
+        self.datasets = datasets
+        
+    def serialize(self):
+        ser = "["
+        for dataset in self.datasets:
+            ser = ser + dataset.serialize() + ","
+        ser += "]"
+        return ser
+            
+        
+class Dataset(object):
+    """
+    A dataset instance to be passed to displayseries.html
+    
+    Args:
+        label (string) : Vehicle/asset name of the series to be plotted
+        borderColor (string) : HTML color code used in plotting of the series
+    """
+    
+    def __init__(self, label, data=[]):
+        self.data = data
+        self.label = label
+        self.borderColor = "#3e95cd"
+        self.fill = False
+        self.showLine = True
+
+    def __str__(self):
+        s = ""
+        for i in range(len(self.data)):
+            s = s + str(self.data[i].x) + ", " + str(self.data[i].y) + "\n"
+        return s
+    
+    def serialize(self):
+        dataset_json = "{data: ["
+        for datum in self.data:
+            dataset_json = dataset_json + datum.serialize() + ","
+        dataset_json += "], "
+        dataset_json += f"label: '{self.label}', borderColor: '{self.borderColor}', fill: {str(self.fill).lower()}, showLine: {str(self.showLine).lower()}}}"
+        return dataset_json
+    
+class DataPoint(object):
+    
+    def __init__(self, x, y):
+        self.x = x
+        self.y = y
+        
+    def serialize(self):
+        return "{{x : {}, y : {} }}".format(self.x, self.y)
